@@ -28,17 +28,25 @@ FALSE="FALSE"
 echo="/bin/echo"	# Do NOT use built-in version of "echo" on /bin/sh
 
 # bdump=/opt/local/bin/bdump
-bdump=/usr/local/bin/bdump
-egrep=/usr/bin/egrep
-gawk=/usr/local/bin/gawk
-han2zen=$HOME/bin/h2z.rb
-nkf=/usr/local/bin/nkf
+#bdump=/usr/local/bin/bdump
+bdump=/usr/bin/od
+# egrep=/usr/bin/egrep
+egrep=/bin/egrep
+# gawk=/usr/local/bin/gawk
+gawk=/usr/bin/gawk
+# han2zen=$HOME/bin/h2z.rb
+han2zen=$HOME/bin/h2z
+# nkf=/usr/local/bin/nkf
+nkf=/usr/bin/nkf
 perl=/usr/bin/perl
-sed=/usr/bin/sed
+# sed=/usr/bin/sed
+sed=/bin/sed
 # showfont=/usr/X11R6/bin/showfont
-showfont=/opt/X11/bin/showfont
+# showfont=/opt/X11/bin/showfont
+showfont=/usr/bin/showfont
 tr=/usr/bin/tr
 xargs=/usr/bin/xargs
+
 
 ### VFONT_ROTATE=$HOME/bin/vfont-should-be-rotated.sh
 VFONT_ROTATE=/bin/cat
@@ -133,17 +141,36 @@ $nkf -w \
 | $sed -e "s/^\"//" -e "s/\"$//" \
 | $tr -d '\n' \
 | $nkf -j \
-| $bdump -xb0 | $sed -e 's/^[0-9A-Fa-f]*://' \
+| od -An -tx1 \
 | $tr -d '\n' \
+| $tr 'a-z' 'A-Z'\
 | $sed -e 's/  */ /g' -e 's/1[bB] 24 42//g' -e 's/1[bB] 28 42//g' \
 | $sed -e 's/  */ /g' -e 's/ \([0-9A-Fa-f][0-9A-Fa-f]\) \([0-9A-Fa-f][0-9A-Fa-f]\)/ \1\2/g' \
 | $tr ' ' '\n' \
 | $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' \
-| $xargs -I % $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
+| $xargs -I % echo $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
 | $egrep '^-|^#|^char' \
 | $sed -e '/^[-#]/s/-/0/g' -e '/^[0#]/s/#/1/g' -e 's/ #/ /g' -e '/^char/s/^/# /g' \
 | $perl -n -e 'if (/^#/){print} else {printf "0x%s,0x%s,%s,%s,\n", unpack("H2", pack("B8",substr($_,0,8))), unpack("H2", pack("B8",substr($_,8,8))),substr($_,0,8),substr($_,8,8)}' \
 | $VFONT_ROTATE
+
+# $nkf -w \
+# | $han2zen \
+# | $sed -e "s/^\"//" -e "s/\"$//" \
+# | $tr -d '\n' \
+# | $nkf -j \
+# | $bdump -xb0 \
+# | $sed -e 's/^[0-9A-Fa-f]*://' \
+# | $tr -d '\n' \
+# | $sed -e 's/  */ /g' -e 's/1[bB] 24 42//g' -e 's/1[bB] 28 42//g' \
+# | $sed -e 's/  */ /g' -e 's/ \([0-9A-Fa-f][0-9A-Fa-f]\) \([0-9A-Fa-f][0-9A-Fa-f]\)/ \1\2/g' \
+# | $tr ' ' '\n' \
+# | $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' \
+# | $xargs -I % $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
+# | $egrep '^-|^#|^char' \
+# | $sed -e '/^[-#]/s/-/0/g' -e '/^[0#]/s/#/1/g' -e 's/ #/ /g' -e '/^char/s/^/# /g' \
+# | $perl -n -e 'if (/^#/){print} else {printf "0x%s,0x%s,%s,%s,\n", unpack("H2", pack("B8",substr($_,0,8))), unpack("H2", pack("B8",substr($_,8,8))),substr($_,0,8),substr($_,8,8)}' \
+# | $VFONT_ROTATE
 
 exit
 
