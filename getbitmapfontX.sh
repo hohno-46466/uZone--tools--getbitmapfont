@@ -34,37 +34,59 @@ echo="/bin/echo"	# Do NOT use built-in version of "echo" on /bin/sh
 
 # bdump=/opt/local/bin/bdump
 # bdump=/usr/local/bin/bdump
+# bdump=$(which bdump)
 # bdumpOpts="-xb0"
 bdump=/usr/bin/od
 bdumpOpts="-An -tx1"
+
 # egrep=/usr/bin/egrep
-egrep=/bin/egrep
+# egrep=/bin/egrep
+egrep=$(which egrep)
+
 # gawk=/usr/local/bin/gawk
-gawk=/usr/bin/gawk
+# gawk=/usr/bin/gawk
+gawk=$(which gawk)
+
 # han2zen=$HOME/bin/h2z.rb
-han2zen=$HOME/bin/h2z
+# han2zen=$HOME/bin/h2z
+han2zen=$(which h2z)
+
 # nkf=/usr/local/bin/nkf
-nkf=/usr/bin/nkf
-perl=/usr/bin/perl
+# nkf=/usr/bin/nkf
+nkf=$(which nkf)
+
+# # perl=/usr/bin/perl
+# perl=$(which perl)
+
 # sed=/usr/bin/sed
-sed=/bin/sed
-# showfont=/usr/X11R6/bin/showfont
-# showfont=/opt/X11/bin/showfont
-showfont=/usr/bin/showfont
-tr=/usr/bin/tr
-xargs=/usr/bin/xargs
+# sed=/bin/sed
+sed=$(which sed)
 
+# # showfont=/usr/X11R6/bin/showfont
+# # showfont=/opt/X11/bin/showfont
+# # showfont=/usr/bin/showfont
+# showfont=$(which showfont)
 
-### VFONT_ROTATE=$HOME/bin/vfont-should-be-rotated.sh
-VFONT_ROTATE=/bin/cat
+# tr=/usr/bin/tr
+# tr=$(which tr)
+tr=$(which tr)
 
-BASENAME=/usr/bin/basename
+# # xargs=/usr/bin/xargs
+# xargs=$(which /usr/bin/xargs)
+
+# ### VFONT_ROTATE=$HOME/bin/vfont-should-be-rotated.sh
+# VFONT_ROTATE=/bin/cat
+
+# BASENAME=/usr/bin/basename
+BASENAME=$(which basename)
 
 # ----------------------------------------------------------
 
 cmdsfound="$TRUE"
 
-for x in bdump egrep gawk han2zen nkf perl sed showfont tr xargs VFONT_ROTATE BASENAME; do
+# for x in bdump egrep gawk han2zen nkf perl sed showfont tr xargs VFONT_ROTATE BASENAME; do
+
+for x in bdump egrep gawk han2zen nkf sed tr BASENAME; do
     cmd=`eval /bin/echo '$'$x`
     if [ "x$cmd" = "x" ]; then
 	cmdsfound="$FALSE"
@@ -143,8 +165,8 @@ fi
 
 # ----------------------------------------------------------
 
-# pcf2bdf  -o jiskan16-2004-1.bdf jiskan16-2004-1.pcf.gz 
-# pcf2bdf  -o jiskan16.bdf jiskan16.pcf.gz 
+# pcf2bdf  -o jiskan16-2004-1.bdf jiskan16-2004-1.pcf.gz
+# pcf2bdf  -o jiskan16.bdf jiskan16.pcf.gz
 
 FONTFILE=$HOME/fonts/jiskan16.bdf
 
@@ -182,7 +204,7 @@ $nkf -w \
 
 for x in $kuten; do
   kuten2bitmap $x
-done  
+done
 
 # $nkf -w \
 # | $han2zen \
