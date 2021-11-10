@@ -169,41 +169,64 @@ fi
 # pcf2bdf  -o jiskan16.bdf jiskan16.pcf.gz
 
 FONTFILE=$HOME/fonts/jiskan16.bdf
+FONTFILE2=$HOME/fonts/.tmpfontfile
 
 if [ ! -f "$FONTFILE" ]; then
   echo "Can't find font file ($FONTFILE)"
   exit 9
 fi
 
+/bin/rm -f $FONTFILE2
+if [ -f "$FONTFILE2" ]; then
+  echo "Can't erase temporary file ($FONTFILE2)"
+  exit 9
+fi
+touch  $FONTFILE2
+if [ ! -f "$FONTFILE2" ]; then
+  echo "Can't create temporary file ($FONTFILE2)"
+  exit 9
+fi
+/bin/rm -f $FONTFILE2
+
 kuten2bitmap () {
-  sed -n -e "/ENCODING $1/,/ENDCHAR/p" $FONTFILE \
-  | sed -n '/^BITMAP/,/^ENDCHAR/p'  \
-  | egrep -v 'BITMAP|ENDCHAR'  \
-  | sed 's/^/1/g'  \
-  | awk '{printf "echo \"obase=2; ibase=16; %s\" | bc\n", $1}'  \
-  | sh  \
-  | sed -e 's/0/ /g' -e 's/^1//'
+  sed -n -e "/ENCODING $1/,/ENDCHAR/p" $2	| # 切り出し1
+  sed -n '/^BITMAP/,/^ENDCHAR/p'		| # 切り出し2
+  egrep -v 'BITMAP|ENDCHAR'			| # 切り出し3
+  sed 's/^/1/g'				| # avoid zero-supressing
+  awk '{printf "echo \"obase=2; ibase=16; %s\" | bc\n", $1}' 	| # convert to binary
+  sh						| # convert to binary
+  sed -e 's/^1//'				  # format （ゼロはそのまま残すのが本来の挙動）
 }
+
+kuten2fontdata () {
+  sed -n -e "/ENCODING $1/,/ENDCHAR/p" $FONTFILE
+ }
+
 
 # ----------------------------------------------------------
 
 kuten=$(\
-$nkf -w \
-| $han2zen \
-| $sed -e "s/^\"//" -e "s/\"$//" \
-| $tr -d '\n' \
-| $nkf -j \
-| $bdump $bdumpOpts \
-| $tr -d '\n' \
-| $tr 'a-z' 'A-Z'\
-| $sed -e 's/  */ /g' -e 's/1[bB] 24 42//g' -e 's/1[bB] 28 42//g' \
-| $sed -e 's/  */ /g' -e 's/ \([0-9A-Fa-f][0-9A-Fa-f]\) \([0-9A-Fa-f][0-9A-Fa-f]\)/ \1\2/g' \
-| $tr ' ' '\n' \
-| $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}'
+  $nkf -w				| # UTF-8へ
+  $han2zen				| # 全角へ
+  $sed -e "s/^\"//" -e "s/\"$//"	| # 前後の　”　を除去
+  $tr -d '\n'				| # 改行を除去して１行にまとめる　
+  $nkf -j				| # JISへ
+  $bdump $bdumpOpts			| # 1バイト単位で16進数表記に変換
+  $tr -d '\n'				| # 改行を除去して１行にまとめる　
+  $tr 'a-z' 'A-Z'			| # 大文字に変換
+  $sed -e 's/  */ /g' -e 's/1[bB] 24 42//g' -e 's/1[bB] 28 42//g' 				| # 前後のエスケープ文字を除去
+  $sed -e 's/  */ /g' -e 's/ \([0-9A-Fa-f][0-9A-Fa-f]\) \([0-9A-Fa-f][0-9A-Fa-f]\)/ \1\2/g'	| # 2バイト単位にまとめる
+  $tr ' ' '\n' 			| # 1文字/行　に変換
+  $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' # 16進数　→　10進数
 )
 
+/bin/rm -f $FONTFILE2
+for x in $(echo $kuten | tr ' ' '\n' | sort -n | uniq); do
+    kuten2fontdata $x
+done > $FONTFILE2
+
 for x in $kuten; do
-  kuten2bitmap $x
+  kuten2bitmap $x $FONTFILE2
 done
 
 # $nkf -w \
