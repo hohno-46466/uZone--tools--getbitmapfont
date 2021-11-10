@@ -30,14 +30,12 @@ FALSE="FALSE"
 
 # ----------------------------------------------------------
 
-echo="/bin/echo"	# Do NOT use built-in version of "echo" on /bin/sh
+echo="/bin/echo"	# Do NOT use built-in version of "echo" included in /bin/sh
 
-# bdump=/opt/local/bin/bdump
-# bdump=/usr/local/bin/bdump
-# bdump=$(which bdump)
-# bdumpOpts="-xb0"
-bdump=/usr/bin/od
-bdumpOpts="-An -tx1"
+# bdump=/opt/local/bin/bdump;	bdumpOpts="-xb0"
+# bdump=/usr/local/bin/bdump;	bdumpOpts="-xb0"
+# bdump=$(which bdump); 	bdumpOpts="-xb0"
+bdump=/usr/bin/od; 		bdumpOpts="-An -tx1"
 
 # egrep=/usr/bin/egrep
 # egrep=/bin/egrep
@@ -55,27 +53,27 @@ han2zen=$(which h2z)
 # nkf=/usr/bin/nkf
 nkf=$(which nkf)
 
-# # perl=/usr/bin/perl
-# perl=$(which perl)
+#X# # perl=/usr/bin/perl
+#X# perl=$(which perl)
 
 # sed=/usr/bin/sed
 # sed=/bin/sed
 sed=$(which sed)
 
-# # showfont=/usr/X11R6/bin/showfont
-# # showfont=/opt/X11/bin/showfont
-# # showfont=/usr/bin/showfont
-# showfont=$(which showfont)
+#X# # showfont=/usr/X11R6/bin/showfont
+#X# # showfont=/opt/X11/bin/showfont
+#X# # showfont=/usr/bin/showfont
+#X# showfont=$(which showfont)
 
 # tr=/usr/bin/tr
 # tr=$(which tr)
 tr=$(which tr)
 
-# # xargs=/usr/bin/xargs
-# xargs=$(which /usr/bin/xargs)
+#X# # xargs=/usr/bin/xargs
+#X# xargs=$(which /usr/bin/xargs)
 
-# ### VFONT_ROTATE=$HOME/bin/vfont-should-be-rotated.sh
-# VFONT_ROTATE=/bin/cat
+#X# ### VFONT_ROTATE=$HOME/bin/vfont-should-be-rotated.sh
+#X# VFONT_ROTATE=/bin/cat
 
 # BASENAME=/usr/bin/basename
 BASENAME=$(which basename)
@@ -84,7 +82,7 @@ BASENAME=$(which basename)
 
 cmdsfound="$TRUE"
 
-# for x in bdump egrep gawk han2zen nkf perl sed showfont tr xargs VFONT_ROTATE BASENAME; do
+#X# for x in bdump egrep gawk han2zen nkf perl sed showfont tr xargs VFONT_ROTATE BASENAME; do
 
 for x in bdump egrep gawk han2zen nkf sed tr BASENAME; do
     cmd=`eval /bin/echo '$'$x`
@@ -148,12 +146,12 @@ How to use this command ?
 # ----------------------------------------------------------
 
 while [ "x$1" != "x" ]; do
-    case $1 in
-	-v)	    flag_verbose="$TRUE"; shift;;
-	-q)	    flag_verbose="$FALSE"; shift;;
-	-h|-help|--help)  flag_help="$TRUE"; break;;
-	*)	    break;;
-    esac
+  case $1 in
+  -v)    flag_verbose="$TRUE"; shift;;
+  -q)    flag_verbose="$FALSE"; shift;;
+  -h|-help|--help)  flag_help="$TRUE"; break;;
+  *)    break;;
+  esac
 done
 
 if [ "x$flag_help" = "x$TRUE" ]; then
@@ -165,14 +163,13 @@ fi
 
 # ----------------------------------------------------------
 
-# pcf2bdf  -o jiskan16-2004-1.bdf jiskan16-2004-1.pcf.gz
 # pcf2bdf  -o jiskan16.bdf jiskan16.pcf.gz
 
-FONTFILE=$HOME/fonts/jiskan16.bdf
+FONTFILE1=$HOME/fonts/jiskan16.bdf
 FONTFILE2=$HOME/fonts/.tmpfontfile
 
-if [ ! -f "$FONTFILE" ]; then
-  echo "Can't find font file ($FONTFILE)"
+if [ ! -f "$FONTFILE1" ]; then
+  echo "Can't find font file ($FONTFILE1)"
   exit 9
 fi
 
@@ -188,6 +185,7 @@ if [ ! -f "$FONTFILE2" ]; then
 fi
 /bin/rm -f $FONTFILE2
 
+#　区点コードをビットマップに変換する関数
 kuten2bitmap () {
   sed -n -e "/ENCODING $1/,/ENDCHAR/p" $2	| # 切り出し1
   sed -n '/^BITMAP/,/^ENDCHAR/p'		| # 切り出し2
@@ -198,13 +196,15 @@ kuten2bitmap () {
   sed -e 's/^1//'				  # format （ゼロはそのまま残すのが本来の挙動）
 }
 
+#　フォントファイルから、区点コードに対応するフォントデータを抜き出す関数
 kuten2fontdata () {
-  sed -n -e "/ENCODING $1/,/ENDCHAR/p" $FONTFILE
- }
+  sed -n -e "/ENCODING $1/,/ENDCHAR/p" $2
+}
 
 
 # ----------------------------------------------------------
 
+# 表示メッセージを1文字ずつ区点コードに変換
 kuten=$(\
   $nkf -w				| # UTF-8へ
   $han2zen				| # 全角へ
@@ -220,32 +220,34 @@ kuten=$(\
   $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' # 16進数　→　10進数
 )
 
+# メッセージに含まれる文字だけからなるフォントファイル（FONTFILE2）を作成
 /bin/rm -f $FONTFILE2
 for x in $(echo $kuten | tr ' ' '\n' | sort -n | uniq); do
-    kuten2fontdata $x
+    kuten2fontdata $x $FONTFILE1
 done > $FONTFILE2
 
+# FONTFILE2 を使ってメッセージをビットマップに変換
 for x in $kuten; do
   kuten2bitmap $x $FONTFILE2
 done
 
-# $nkf -w \
-# | $han2zen \
-# | $sed -e "s/^\"//" -e "s/\"$//" \
-# | $tr -d '\n' \
-# | $nkf -j \
-# | $bdump $bdumpOpts \
-# | $sed -e 's/^[0-9A-Fa-f]*://' \
-# | $tr -d '\n' \
-# | $sed -e 's/  */ /g' -e 's/1[bB] 24 42//g' -e 's/1[bB] 28 42//g' \
-# | $sed -e 's/  */ /g' -e 's/ \([0-9A-Fa-f][0-9A-Fa-f]\) \([0-9A-Fa-f][0-9A-Fa-f]\)/ \1\2/g' \
-# | $tr ' ' '\n' \
-# | $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' \
-# | $xargs -I % $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
-# | $egrep '^-|^#|^char' \
-# | $sed -e '/^[-#]/s/-/0/g' -e '/^[0#]/s/#/1/g' -e 's/ #/ /g' -e '/^char/s/^/# /g' \
-# | $perl -n -e 'if (/^#/){print} else {printf "0x%s,0x%s,%s,%s,\n", unpack("H2", pack("B8",substr($_,0,8))), unpack("H2", pack("B8",substr($_,8,8))),substr($_,0,8),substr($_,8,8)}' \
-# | $VFONT_ROTATE
+#X# $nkf -w \
+#X# | $han2zen \
+#X# | $sed -e "s/^\"//" -e "s/\"$//" \
+#X# | $tr -d '\n' \
+#X# | $nkf -j \
+#X# | $bdump $bdumpOpts \
+#X# | $sed -e 's/^[0-9A-Fa-f]*://' \
+#X# | $tr -d '\n' \
+#X# | $sed -e 's/  */ /g' -e 's/1[bB] 24 42//g' -e 's/1[bB] 28 42//g' \
+#X# | $sed -e 's/  */ /g' -e 's/ \([0-9A-Fa-f][0-9A-Fa-f]\) \([0-9A-Fa-f][0-9A-Fa-f]\)/ \1\2/g' \
+#X# | $tr ' ' '\n' \
+#X# | $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' \
+#X# | $xargs -I % $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
+#X# | $egrep '^-|^#|^char' \
+#X# | $sed -e '/^[-#]/s/-/0/g' -e '/^[0#]/s/#/1/g' -e 's/ #/ /g' -e '/^char/s/^/# /g' \
+#X# | $perl -n -e 'if (/^#/){print} else {printf "0x%s,0x%s,%s,%s,\n", unpack("H2", pack("B8",substr($_,0,8))), unpack("H2", pack("B8",substr($_,8,8))),substr($_,0,8),substr($_,8,8)}' \
+#X# | $VFONT_ROTATE
 
 # ----------------------------------------------------------
 
