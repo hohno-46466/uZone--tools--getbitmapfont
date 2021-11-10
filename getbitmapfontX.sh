@@ -4,12 +4,14 @@
 
 # First version: Tue Nov  9 07:10:37 JST 2021 (modified freom getbitmapfont.sh)
 
+# ----------------------------------------------------------
 # History of original script (getbitmapfont.sh)
 # Prev update: Mon Dec 26 08:16:28 JST 2011 by hohno
 # Prev update: Tue Nov 27 06:49:20 JST 2012 by hohno
 # Prev udpate: Wed Jan 15 11:02:41 JST 2014 by hohno
 # Prev udpate: Fri Jul 18 00:09:22 JST 2014 by hohno
 # Last udpate: Sat Dec 27 11:34:14 JST 2014 by hohno
+# ----------------------------------------------------------
 
 # ----------------------------------------------------------
 # Definition and initialize global variables
@@ -25,8 +27,10 @@ FALSE="FALSE"
 
 # ----------------------------------------------------------
 
-[ "x$TARGETFONTNAME" = "x" ] && TARGETFONTNAME="kanji16"
-[ "x$TARGETFONTSIZE" = "x" ] && TARGETFONTSIZE="16"
+#X# [ "x$TARGETFONTNAME" = "x" ] && TARGETFONTNAME="kanji16"
+#X# [ "x$TARGETFONTSIZE" = "x" ] && TARGETFONTSIZE="16"
+
+TARGETFONTNAME=jiskan16
 
 # ----------------------------------------------------------
 
@@ -53,8 +57,8 @@ han2zen=$(which h2z)
 # nkf=/usr/bin/nkf
 nkf=$(which nkf)
 
-#X# # perl=/usr/bin/perl
-#X# perl=$(which perl)
+perl=/usr/bin/perl
+perl=$(which perl)
 
 # sed=/usr/bin/sed
 # sed=/bin/sed
@@ -84,7 +88,7 @@ cmdsfound="$TRUE"
 
 #X# for x in bdump egrep gawk han2zen nkf perl sed showfont tr xargs VFONT_ROTATE BASENAME; do
 
-for x in bdump egrep gawk han2zen nkf sed tr BASENAME; do
+for x in bdump egrep gawk han2zen nkf perl sed tr BASENAME; do
     cmd=`eval /bin/echo '$'$x`
     if [ "x$cmd" = "x" ]; then
 	cmdsfound="$FALSE"
@@ -163,9 +167,10 @@ fi
 
 # ----------------------------------------------------------
 
-# pcf2bdf  -o jiskan16.bdf jiskan16.pcf.gz
+# Memo: foo.bdf can be generated from foo.pcf.gz like this:
+#       as $pcf2bdf -o foo.bdf foo.pcf.gz
 
-FONTFILE1=$HOME/fonts/jiskan16.bdf
+FONTFILE1=$HOME/fonts/${TARGETFONTNAME}.bdf
 FONTFILE2=$HOME/fonts/.tmpfontfile
 
 if [ ! -f "$FONTFILE1" ]; then
@@ -173,20 +178,22 @@ if [ ! -f "$FONTFILE1" ]; then
   exit 9
 fi
 
-/bin/rm -f $FONTFILE2
+/bin/rm -f "$FONTFILE2"
 if [ -f "$FONTFILE2" ]; then
   echo "Can't erase temporary file ($FONTFILE2)"
   exit 9
 fi
-touch  $FONTFILE2
+touch  "$FONTFILE2"
 if [ ! -f "$FONTFILE2" ]; then
   echo "Can't create temporary file ($FONTFILE2)"
   exit 9
 fi
-/bin/rm -f $FONTFILE2
+/bin/rm -f "$FONTFILE2"
+
+# ----------------------------------------------------------
 
 #　区点コードをビットマップに変換する関数
-kuten2bitmap () {
+kuten2bitmap () {				  # （$1 - 区点コード, $2 - フォントファイル）
   sed -n -e "/ENCODING $1/,/ENDCHAR/p" $2	| # 切り出し1
   sed -n '/^BITMAP/,/^ENDCHAR/p'		| # 切り出し2
   egrep -v 'BITMAP|ENDCHAR'			| # 切り出し3
@@ -197,10 +204,9 @@ kuten2bitmap () {
 }
 
 #　フォントファイルから、区点コードに対応するフォントデータを抜き出す関数
-kuten2fontdata () {
+kuten2fontdata () {				  # （$1 - 区点コード, $2 - フォントファイル）
   sed -n -e "/ENCODING $1/,/ENDCHAR/p" $2
 }
-
 
 # ----------------------------------------------------------
 
@@ -221,15 +227,18 @@ kuten=$(\
 )
 
 # メッセージに含まれる文字だけからなるフォントファイル（FONTFILE2）を作成
-/bin/rm -f $FONTFILE2
+/bin/rm -f "$FONTFILE2"
 for x in $(echo $kuten | tr ' ' '\n' | sort -n | uniq); do
-    kuten2fontdata $x $FONTFILE1
-done > $FONTFILE2
+  kuten2fontdata $x "$FONTFILE1"
+done > "$FONTFILE2"
 
 # FONTFILE2 を使ってメッセージをビットマップに変換
 for x in $kuten; do
-  kuten2bitmap $x $FONTFILE2
+  kuten2bitmap $x "$FONTFILE2"		 |
+  $perl -n -e 'if (/^#/){print} else {printf "0x%s,0x%s,%s,%s,\n", unpack("H2", pack("B8",substr($_,0,8))), unpack("H2", pack("B8",substr($_,8,8))),substr($_,0,8),substr($_,8,8)}'
 done
+
+/bin/rm -f "$FONTFILE2"
 
 #X# $nkf -w \
 #X# | $han2zen \
