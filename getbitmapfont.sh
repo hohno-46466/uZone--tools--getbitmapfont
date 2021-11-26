@@ -149,13 +149,6 @@ $nkf -w \
 | $tr ' ' '\n' \
 | $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' \
 | $xargs -I % echo $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
-<<<<<<< HEAD
-|cat 
-=======
->>>>>>> 820f026a91d8d2b9029567219505a50e2cf1d62a
-
-exit
-
 | $egrep '^-|^#|^char' \
 | $sed -e '/^[-#]/s/-/0/g' -e '/^[0#]/s/#/1/g' -e 's/ #/ /g' -e '/^char/s/^/# /g' \
 | $perl -n -e 'if (/^#/){print} else {printf "0x%s,0x%s,%s,%s,\n", unpack("H2", pack("B8",substr($_,0,8))), unpack("H2", pack("B8",substr($_,8,8))),substr($_,0,8),substr($_,8,8)}' \
