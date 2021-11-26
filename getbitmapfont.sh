@@ -149,7 +149,10 @@ $nkf -w \
 | $tr ' ' '\n' \
 | $gawk '{if (NF>0){printf "%3d\n",strtonum("0x"$1)}}' \
 | $xargs -I % echo $showfont -b 2 -start % -end % -fn $TARGETFONTNAME \
+<<<<<<< HEAD
 |cat 
+=======
+>>>>>>> 820f026a91d8d2b9029567219505a50e2cf1d62a
 
 exit
 
