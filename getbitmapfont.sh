@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 # Prev update: Mon Dec 26 08:16:28 JST 2011 by hohno
 # Prev update: Tue Nov 27 06:49:20 JST 2012 by hohno
