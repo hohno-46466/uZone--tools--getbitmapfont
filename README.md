@@ -21,7 +21,7 @@ getbitmapfont.sh provides bitmap font of Japanese kanji characters
          │   └──  id_rsa.pub
          └──  trans270.rb
      
-     3 directories, 14 files (Sun Jul 17 22:39:00 JST 2022)
+     3 directories, 14 files (Mon Aug  8 21:42:53 JST 2022)
 
 
 Note: url = https://github.com/hohno-46466/uZone--tools--getbitmapfont
