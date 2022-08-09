@@ -24,8 +24,8 @@ getbitmapfont.sh provides bitmap font of Japanese kanji characters
      3 directories, 14 files (Mon Aug  8 21:42:53 JST 2022)
 
 
-Note: url = https://github.com/hohno-46466/uZone--tools--getbitmapfont
+Note: URL = https://github.com/hohno-46466/uZone--tools--getbitmapfont
 
-Note: url = git@github.com:hohno-46466/uZone--tools--getbitmapfont.git
+Note: URL = git@github.com:hohno-46466/uZone--tools--getbitmapfont.git
 
 -EOF-
