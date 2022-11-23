@@ -2,7 +2,7 @@
 
 # very early version
 
-# Last update: Fri Dec  2 08:10:47 JST 2016
+# Last updated: Fri Dec  2 08:10:47 JST 2016
 
 TMP=/tmp/text2ppm-tmp.txt
 OUT=/tmp/text2ppm-out.ppm

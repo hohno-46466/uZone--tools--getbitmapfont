@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Prev update: Sat Aug 29 12:09:05 JST 2020
-# Last update: Mon Sep 14 08:23:40 JST 2020
+# Last updated: Mon Sep 14 08:23:40 JST 2020
 
 # ==========================================================
 # 表示したいメッセージを makeIt() に記述すること
