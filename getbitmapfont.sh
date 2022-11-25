@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Prev update: Mon Dec 26 08:16:28 JST 2011 by hohno
-# Prev update: Tue Nov 27 06:49:20 JST 2012 by hohno
+# Prev updated: Mon Dec 26 08:16:28 JST 2011 by hohno
+# Prev updated: Tue Nov 27 06:49:20 JST 2012 by hohno
 # Prev udpate: Wed Jan 15 11:02:41 JST 2014 by hohno
 # Prev udpate: Fri Jul 18 00:09:22 JST 2014 by hohno
 # Last udpate: Sat Dec 27 11:34:14 JST 2014 by hohno

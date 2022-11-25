@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Prev update: Sat Aug 29 12:09:05 JST 2020
-# Prev update: Mon Sep 14 08:23:40 JST 2020
-# Prev update: Tue Sep 22 07:47:45 JST 2020
+# Prev updated: Sat Aug 29 12:09:05 JST 2020
+# Prev updated: Mon Sep 14 08:23:40 JST 2020
+# Prev updated: Tue Sep 22 07:47:45 JST 2020
 # Last updated: Sat Dec 12 14:09:57 JST 2020
 
 # ----------------------------------------------------------
