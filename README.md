@@ -2,26 +2,32 @@
 
 getbitmapfont.sh provides bitmap font of Japanese kanji characters
 
-     ./uZone--tools--getbitmapfont
+    ./uZone--tools--getbitmapfont
      ├──  README.md
      ├──  README.md.old
      ├──  fonts/
      │   ├──  jiskan16.bdf
      │   └──  jiskan16.pcf.gz
      ├──  getbitmapfont.sh
+     ├──  getbitmapfont.sh.bak
      ├──  getbitmapfontX.sh
+     ├──  getbitmapfontX.sh.bak
      └──  misc/
          ├──  make_16xN_bitmap.sh
+         ├──  make_16xN_bitmap.sh.bak
          ├──  make_16xN_bitmap_test1.sh
          ├──  make_16xN_bitmap_wrapper.bak.sh
+         ├──  make_16xN_bitmap_wrapper.bak.sh.bak
          ├──  make_16xN_bitmap_wrapper.sh
+         ├──  make_16xN_bitmap_wrapper.sh.bak
          ├──  output.ppm
          ├──  text2ppm.sh
+         ├──  text2ppm.sh.bak
          ├──  tmp/
          │   └──  id_rsa.pub
          └──  trans270.rb
      
-     3 directories, 14 files (Wed Dec 21 18:51:18 JST 2022)
+     3 directories, 20 files (Thu Dec 22 04:09:42 JST 2022)
 
 
 Note: URL = https://github.com/hohno-46466/uZone--tools--getbitmapfont
